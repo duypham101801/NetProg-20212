@@ -1,0 +1,14 @@
+.stepTxt {
+    margin-top: 10px;
+    color: #737373;
+}
+
+.checkerTitle {
+    color: #007ACC;
+    font-weight: 400;
+}
+
+.checkerBox {
+    min-height: 500px;
+    background-color: white;
+}
