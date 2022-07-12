@@ -25,17 +25,26 @@ public class WelcomeServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		if (request.getAttribute("result") == null){			
+			CSConnection.main();
+		}
+        request.getRequestDispatcher("/login.jsp").forward(request, response);
+//		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		int logInResult = CSConnection.LogIn(request.getParameter("Username"),request.getParameter("Password"));
+		if (logInResult == 1) {
+			request.getRequestDispatcher("/index.jsp").forward(request, response);
+		} else {
+			request.setAttribute("result", logInResult);
+			request.getRequestDispatcher("/login.jsp").forward(request, response);
+		}
+		System.out.println("[DEBUG] Username = " + request.getParameter("Username"));
+		System.out.println("[DEBUG] Password = " + request.getParameter("Password"));
 	}
 
 }
