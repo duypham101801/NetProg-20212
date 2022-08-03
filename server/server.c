@@ -66,6 +66,21 @@ void sendtoclient(char *servmsg, int curr) {
     pthread_mutex_unlock(&mutex);
 }
 
+// send message to other client - doctor
+void sendtoother(char *servmsg, int curr) {
+    pthread_mutex_lock(&mutex);
+    for (int i=0; i<clinum; ++i) {
+        if (clients[i] != curr) {
+            if(send(clients[i], servmsg, strlen(servmsg), 0) < 0) {
+                printf("Sending failure\n");
+                continue;
+            }
+        }
+    }
+    // close(connfd);
+    pthread_mutex_unlock(&mutex);
+}
+
 // server action: send + recv messages
 void *dealmsg(void *connfd) {
     int sock = *((int *)connfd);
@@ -274,7 +289,7 @@ void *dealmsg(void *connfd) {
     	   	tmp[strlen(tmp)] = '\0';
     	   	
     	   	if(strlen(tmp) != 0) {
-    	   		printf("tmp is: %s\n", tmp);
+    	   		// printf("tmp is: %s\n", tmp);
     	   		strncat(servmsg, &rightParent, 1);
 			strcat(servmsg, tmp);
 			strncat(servmsg, &leftParent, 1);
@@ -288,7 +303,7 @@ void *dealmsg(void *connfd) {
 		
 			// int step = sqlite3_step(res);
 			if(sqlite3_step(res) == SQLITE_ROW) {
-				printf("Ans needs is: %s\n", sqlite3_column_text(res, 0));
+				// printf("Ans needs is: %s\n", sqlite3_column_text(res, 0));
 				strncat(servmsg, &rightParent, 1);
 				strcat(servmsg, sqlite3_column_text(res, 0));
 				strncat(servmsg, &leftParent, 1);
@@ -299,19 +314,86 @@ void *dealmsg(void *connfd) {
     	   }
     	   
     	   sqlite3_finalize(res);
-    	   printf("Server msg now: %s\n", servmsg);
+    	   // printf("Server msg now: %s\n", servmsg);
            // strncpy(servmsg, "DIG_ANS <index symtom 1> <result 1> - <index symtom 2> <result 2> - <> <> - …", strlen("DIG_ANS <index symtom 1> <result 1> - <index symtom 2> <result 2> - <> <> - "));
            
     	} else if(strcmp(header, "QUIT") == 0) {
+    	
+    	   // accept action for quit session
 	   strncpy(servmsg, "QUIT_ACCEPT", strlen("QUIT_ACCEPT"));
+	   
     	} else if(strcmp(header, "CONSULT_REQ") == 0) {
+    	   
+    	   // accept action chat
 	   strncpy(servmsg, "CONSULT_PAT <success>", strlen("CONSULT_PAT <success>"));
-    	} else if(strcmp(header, "MSG_SEND") == 0) {
-
-    	} else if(strcmp(header, "MSG_RECV_SUCCESS") == 0) {
-
+	   
     	} else if(strcmp(header, "ASSIGN_REQ") == 0) {
-	    strncpy(servmsg, "ASSIGN <success", strlen("ASSIGN <success>"));
+    	    
+    	    // accept assign doctor
+	    strncpy(servmsg, "ASSIGN <success>", strlen("ASSIGN <success>"));
+	    
+    	} else if(strcmp(header, "DOC_SEND") == 0) {
+	    
+	    // deal with message doctor sends
+	    char docmsg[MAXLINE], tmpDoc[MAXLINE];
+	    memset(docmsg, 0, sizeof(docmsg));
+	    memset(tmpDoc, 0, sizeof(tmpDoc));
+	    
+	    int doccount = 0;
+	    int doctmp = 0;
+	    strncpy(docmsg, "PAT_RECV ", strlen("PAT_RECV "));
+	    strncat(docmsg, &rightParent, 1);
+
+	    for (int i=0; i<strlen(msg); ++i) {
+	    	if(msg[i] == '<') {
+	    		doctmp = 1;
+	    	} else if(msg[i] == '>') {
+	    		doctmp = 0;
+	    	}
+	    	
+	    	if(doctmp == 1) {
+	    		doccount += 1;
+	    	}
+	    }
+
+
+	    strncpy(tmpDoc, msg+10, doccount-1);
+	    strcat(docmsg, tmpDoc);
+	    strncat(docmsg, &leftParent, 1);
+	    printf("Message doctor sends to patient: %s\n", docmsg);
+	    sendtoother(docmsg, sock);
+	    
+    	} else if(strcmp(header, "PAT_SEND") == 0) {\
+    	
+    	    // deal with message patient sends
+    	    char patmsg[MAXLINE], tmpPat[MAXLINE];
+	    memset(patmsg, 0, sizeof(patmsg));
+	    memset(tmpPat, 0, sizeof(tmpPat));
+	    
+	    int patcount = 0;
+	    int pattmp = 0;
+	    strncpy(patmsg, "DOC_RECV ", strlen("DOC_RECV "));
+	    strncat(patmsg, &rightParent, 1);
+
+	    for (int i=0; i<strlen(msg); ++i) {
+	    	if(msg[i] == '<') {
+	    		pattmp = 1;
+	    	} else if(msg[i] == '>') {
+	    		pattmp = 0;
+	    	}
+	    	
+	    	if(pattmp == 1) {
+	    		patcount += 1;
+	    	}
+	    }
+
+
+	    strncpy(tmpPat, msg+10, patcount-1);
+	    strcat(patmsg, tmpPat);
+	    strncat(patmsg, &leftParent, 1);
+	    printf("Message patient sends to doctor: %s\n", patmsg);
+	    sendtoother(patmsg, sock);
+
     	} else {
             printf("Header not exist!!! Check format header message!");
             strncpy(servmsg, "", strlen(""));
@@ -372,7 +454,7 @@ int main(int argc, char **argv) {
         
         // lock mutex
         pthread_mutex_lock(&mutex);
-        printf("Client [%d] with ip [%d] connected successful!\n", clinum, inet_ntoa(servaddr.sin_addr));
+        printf("Client [%d] with ip [%s] connected successful!\n", clinum, inet_ntoa(servaddr.sin_addr));
         clients[clinum] = connfd;
         clinum++;
 
