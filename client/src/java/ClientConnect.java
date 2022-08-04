@@ -292,7 +292,7 @@ public class ClientConnect
      		else if (reply.contains("success")) {
      			System.out.println("Patient connects successfully! Waiting for assign doctor ...");
      			// chat action 
-     			System.out.println("Start chat with patient!");
+     			System.out.println("Start chat with doctor!");
             	
             	while(true) {
             		try {
@@ -302,8 +302,14 @@ public class ClientConnect
                      	System.out.println("Message to doctor: " + msg);
                      	dos.write(msg);
                      	dos.flush();
-                     	msg = "";
-            			
+                     	msg = "";	
+                 		
+            		} catch(IOException e) {
+            			e.printStackTrace();
+            			return ;
+            		}
+            		
+            		try {            			
             			// read message to this patient(pat -> ser -> doc)
                  		BufferedReader br1 = new BufferedReader(dis);
                  		char[] buffer1 = new char[10000];

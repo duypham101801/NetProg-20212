@@ -111,10 +111,42 @@ public class DoctorConnect
         } else {
         	System.out.println("Failed to assign!");
         }
+        /*======================================================================================*/
+        if(keyAssignReq) {
+        	System.out.println("Request for patient diagnosis!");
+            msg = "DOC_DIAG ";
+            
+            try {
+             	// write on output stream
+             	System.out.println("Message from client: " + msg);
+             	dos.write(msg);
+             	dos.flush();
+             	msg = "";
+             	// System.out.println("Check dos: " + dos);
+             	// dos.close();
+             			
+             	// System.out.println("Socket closed: " + s.isClosed());
+             			
+             	// read message to this client
+         		BufferedReader br = new BufferedReader(dis);
+         		char[] buffer = new char[10000];
+         		int count = br.read(buffer, 0, 10000);
+         		reply = new String(buffer, 0, count);
+         		System.out.println("Message to client: " + reply + "\n");
+         		// dos.close();
+         		dis.ready();
+            } catch (IOException e) {
+             	e.printStackTrace();
+             	return ;
+            }
+        } else {
+        	System.out.println("Assignment not yet!");
+        }
         
         /*=======================================================================================*/
         if(keyAssignReq) {
         	System.out.println("Start chat with patient!");
+        	
         	
         	while(true) {
         		try {
@@ -124,8 +156,14 @@ public class DoctorConnect
                  	System.out.println("Message to client: " + msg);
                  	dos.write(msg);
                  	dos.flush();
-                 	msg = "";
-        			
+                 	msg = "";        		
+             		
+        		} catch(IOException e) {
+        			e.printStackTrace();
+        			return ;
+        		}
+        		
+        		try {
         			// read message to this patient(pat -> ser -> doc)
              		BufferedReader br = new BufferedReader(dis);
              		char[] buffer = new char[10000];

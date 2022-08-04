@@ -45,6 +45,7 @@ char copyListSymp[MAXLINE];
 char listAns[MAXLINE];  /*list of answer that said yes*/
 char copyListAns[MAXLINE];
 char listDiag[MAXLINE]; /*list diagnosis*/
+char docDiag[MAXLINE]; /*contains diagnosis of patient to doctor*/
 
 char rightParent = '<';
 char leftParent = '>';
@@ -310,8 +311,11 @@ void *dealmsg(void *connfd) {
 			}
 			strncat(servmsg, &ngang, 1);
 		}
+		
 		memset(tmp, 0, sizeof(tmp));
     	   }
+    	   strncpy(docDiag, servmsg, strlen(servmsg));
+	   printf("Copy diagnosis is: %s\n", docDiag);
     	   
     	   sqlite3_finalize(res);
     	   // printf("Server msg now: %s\n", servmsg);
@@ -332,7 +336,14 @@ void *dealmsg(void *connfd) {
     	    // accept assign doctor
 	    strncpy(servmsg, "ASSIGN <success>", strlen("ASSIGN <success>"));
 	    
-    	} else if(strcmp(header, "DOC_SEND") == 0) {
+    	} else if (strcmp(header, "DOC_DIAG") == 0) {
+    	    
+    	    // send doctor diagnosis of patient
+    	    printf("Doc diag is: %s\n", docDiag);
+    	    strncpy(servmsg, docDiag, strlen(docDiag));
+    	    memset(docDiag, 0, sizeof(docDiag));
+    	    
+    	}else if(strcmp(header, "DOC_SEND") == 0) {
 	    
 	    // deal with message doctor sends
 	    char docmsg[MAXLINE], tmpDoc[MAXLINE];
