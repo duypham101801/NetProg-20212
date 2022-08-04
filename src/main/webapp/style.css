@@ -1,0 +1,31 @@
+.stepTxt {
+    margin-top: 10px;
+    color: #737373;
+}
+
+.checkerTitle {
+    color: #007ACC;
+    font-weight: 400;
+}
+
+.checkerBox {
+    min-height: 500px;
+    background-color: white;
+}
+
+.indexList label {
+	display: block;
+	text-decoration: none;
+	border: solid 1px black;
+	color: black;
+}
+
+.indexList input[type=checkbox] {
+	display: none;
+}
+
+.indexList input[type=checkbox]:checked + label {
+	border: solid 1px blue;
+	color: blue;
+	text-decoration: underline;
+}
