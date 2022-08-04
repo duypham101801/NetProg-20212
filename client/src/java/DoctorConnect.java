@@ -15,7 +15,7 @@ public class DoctorConnect
           
         // getting localhost ip
         //InetAddress ip = InetAddress.getByName("localhost");
-        byte[] ipAddr = new byte[] {(byte) 192, (byte) 168, (byte) 1, (byte) 86};
+        byte[] ipAddr = new byte[] {(byte) 127, (byte) 0, (byte) 0, (byte) 1};
         InetAddress ip = InetAddress.getByAddress(ipAddr);
           
         // establish the connection
