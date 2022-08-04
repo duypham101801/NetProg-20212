@@ -96,7 +96,7 @@ void *dealmsg(void *connfd) {
     
     // open database
     sqlite3 *db;
-    int rc = sqlite3_open("/home/manhdao/server/db/symptomchecker.db", &db);  /*Change dir to db here*/
+    int rc = sqlite3_open("../db/symptomchecker.db", &db);  /*Change dir to db here*/
     sqlite3_stmt *res;
     
     if(rc != SQLITE_OK) {
@@ -179,8 +179,12 @@ void *dealmsg(void *connfd) {
 	   	
 	   	printf("Number of doctor: %d\n", docCount);
 	   	printf("Number of patient: %d\n", patCount);
-	   	// get messgage according to username & password   		
-	   	strncpy(servmsg, "REG_SUCCESS <true>", strlen("REG_SUCCESS <true>"));
+	   	// get messgage according to username & password   	
+	   	if (strcmp(sqlite3_column_text(res, 4), "doc") == 0) {
+	   		strncpy(servmsg, "REG_SUCCESS <true> <doc>", strlen("REG_SUCCESS <true> <doc>"));
+	   	} else if (strcmp(sqlite3_column_text(res, 4), "pat") == 0) {
+	   		strncpy(servmsg, "REG_SUCCESS <true> <pat>", strlen("REG_SUCCESS <true> <pat>"));
+	   	}
 	   } else {
 	   	printf("Failed to access to server! Check usename or password!\n");
 	   	// get messgage according to username & password   		
@@ -465,7 +469,7 @@ int main(int argc, char **argv) {
         
         // lock mutex
         pthread_mutex_lock(&mutex);
-        printf("Client [%d] with ip [%s] connected successful!\n", clinum, inet_ntoa(servaddr.sin_addr));
+        printf("Client [%d] with ip [%s] connected successful!\n", clinum, inet_ntoa(cliaddr.sin_addr));
         clients[clinum] = connfd;
         clinum++;
 
