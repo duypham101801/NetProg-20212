@@ -195,7 +195,7 @@ void *dealmsg(void *connfd) {
     	   
     	} else if (strcmp(header, "SYMP_REQ") == 0) {
     	
-	   strncpy(servmsg, "SYMP_FORM <1><abdominal pain> - <2><ankle problems> - <3><cold and flu> - <4><cough> - <5><hair loss>", strlen("SYMP_FORM <1><abdominal pain> - <2><ankle problems> - <3><cold and flu> - <4><cough> - <5><hair loss>"));
+	   strncpy(servmsg, "SYMP_FORM-<1><abdominal pain>-<2><ankle problems>-<3><cold and flu>-<4><cough>-<5><hair loss>", strlen("SYMP_FORM-<1><abdominal pain>-<2><ankle problems>-<3><cold and flu>-<4><cough>-<5><hair loss>"));
 	   
         } else if (strcmp(header, "SYMP_SUBMIT") == 0) {
            for(int i=0; i<strlen(msg); i++) {
@@ -216,7 +216,7 @@ void *dealmsg(void *connfd) {
 	   
     	} else if (strcmp(header, "ANS_REQ") == 0) {
     	   // initialize servmsg
-    	   strncpy(servmsg, "ANS_FORM ", strlen("ANS_FORM "));
+    	   strncpy(servmsg, "ANS_FORM~", strlen("ANS_FORM "));
     	   char *sql = "SELECT qid, detail FROM question where sid = ?";
     	   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
     	   
@@ -276,12 +276,13 @@ void *dealmsg(void *connfd) {
 	   memset(listAns, 0, sizeof(listAns));
 	   
     	} else if(strcmp(header, "DIG_REQ") == 0) {
-    	   strncpy(servmsg, "DIG_ANS ", strlen("DIG_ANS "));
+    	   strncpy(servmsg, "DIG_ANS-", strlen("DIG_ANS "));
     	   char *sql = "SELECT dname FROM diagnosis where qid = ?";
     	   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
     	   
-    	   for(int i=0; i<strlen(copyListAns); ++i) {
-    	   	char tmp[3];
+    	   for(int i=0; i<strlen(copyListAns); i++) {
+    	   	printf("%c ",copyListAns[i]);
+    	   	char tmp[3] = "";
     	   	
     	   	if(copyListAns[i] == '-') {
     	   		if(isdigit(copyListAns[i-1]) && isdigit(copyListAns[i-2])) {
@@ -292,6 +293,7 @@ void *dealmsg(void *connfd) {
     	   		}
     	   	}
     	   	tmp[strlen(tmp)] = '\0';
+    	   	printf("%s\n",tmp);
     	   	
     	   	if(strlen(tmp) != 0) {
     	   		// printf("tmp is: %s\n", tmp);
