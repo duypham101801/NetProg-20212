@@ -109,10 +109,10 @@
                         	<p class="fw-bold text-capitalize" id="diagnosis" style="color: #0d6efd;"><%= CSConnection.diagString[i] %></p>
                    		<% } %>
                     </div>
+                    <form action="index" method="POST" name="step3">
+                        <input type="submit" class="btn fw-bolder mt-4 px-5 py-2" style="color: white; background-color: #FE5655;" id="request" name="requestCons" value="Request Consult">
+                    </form>
                     <% } %>
-                    <div >
-                        <button type="button" class="btn fw-bolder mt-4 px-5 py-2" style="color: white; background-color: #FE5655;" id="request" name="request">Request Consult</button>
-                    </div>
                 </div>
                 <!--Step 3 end-->
             </div>   

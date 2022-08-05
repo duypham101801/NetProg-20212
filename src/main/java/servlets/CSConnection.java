@@ -320,7 +320,7 @@ public class CSConnection {
 		msg = msg + "-";
  		
         try {
-         	// write on output stream
+        	// write on output stream
          	System.out.println("Message from client: " + msg);
          	dos.write(msg);
          	dos.flush();
@@ -381,5 +381,94 @@ public class CSConnection {
         	return -1;
         }
 		return -1;
+	}
+	
+	public static void ChatFunction() {
+		System.out.println("Do you want to chat with doctor:");
+        System.out.println("Note: y-yes / n-no");
+        String chat = scn.nextLine();
+        if (chat.equals("y")) {
+        	keyChat = true;
+        } else {
+        	keyChat = false;
+        }
+        
+        if (keyChat) {
+        	// start chat server
+        	// wait for assign doctor - patient
+        	System.out.println("Patient wants to chat directly to doctor!");
+        	msg = "CONSULT_REQ ";
+        } else {
+        	// patients/doctor leave
+        	System.out.println("Patient leaves the room!");
+        	msg = "QUIT";
+        }
+        
+        try {
+         	// write on output stream
+         	System.out.println("Message from client: " + msg);
+         	dos.write(msg);
+         	dos.flush();
+         	// dos.close();	
+         	// System.out.println("Socket closed: " + s.isClosed());
+         			
+         	// read message to this client
+     		BufferedReader br = new BufferedReader(dis);
+     		char[] buffer = new char[10000];
+     		int count = br.read(buffer, 0, 10000);
+     		reply = new String(buffer, 0, count);
+     		System.out.println("Message to client: " + reply + "\n");
+     		if (reply.contains("QUIT_ACCEPT")) {
+     			System.out.println("Patient leaves successfully! Close socket to server!");
+     			s.close();
+     		}
+     		else if (reply.contains("success")) {
+     			System.out.println("Patient connects successfully! Waiting for assign doctor ...");
+     			// chat action 
+     			System.out.println("Start chat with doctor!");
+            	
+            	while(true) {
+            		try {
+            			// write on output stream
+                 		msg = scn.nextLine();
+                 		msg = "PAT_SEND " + "<" + msg + ">";
+                     	System.out.println("Message to doctor: " + msg);
+                     	dos.write(msg);
+                     	dos.flush();
+                     	msg = "";	
+                 		
+            		} catch(IOException e) {
+            			e.printStackTrace();
+            			return ;
+            		}
+            		
+            		try {            			
+            			// read message to this patient(pat -> ser -> doc)
+                 		BufferedReader br1 = new BufferedReader(dis);
+                 		char[] buffer1 = new char[10000];
+                 		int count1 = br1.read(buffer1, 0, 10000);
+                 		reply = new String(buffer1, 0, count1);
+                 		if (reply.contains("PAT_RECV")) {
+                 			System.out.println("Message from doctor: " + reply + "\n");
+                 			continue;
+                 		} else {
+                 			System.out.println("Format message not to doctor!");
+                 			s.close();
+                 		}
+                 		// dos.close();
+                 		dis.ready();         		
+                 		
+            		} catch(IOException e) {
+            			e.printStackTrace();
+            			return ;
+            		}
+            	}
+     		}
+     		// dos.close();
+     		dis.ready();
+        } catch (IOException e) {
+         	e.printStackTrace();
+         	return ;
+        }
 	}
 }

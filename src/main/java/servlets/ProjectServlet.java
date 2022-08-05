@@ -52,6 +52,8 @@ public class ProjectServlet extends HttpServlet {
 			CSConnection.SubmitAns(checkedValues2);
 			CSConnection.RequestDiag();
 			request.getRequestDispatcher("/index.jsp").forward(request, response);
+		} else if (request.getParameter("requestCons") != null) {
+			CSConnection.ChatFunction();			
 		}
 	}
 

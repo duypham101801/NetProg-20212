@@ -281,7 +281,6 @@ void *dealmsg(void *connfd) {
     	   rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
     	   
     	   for(int i=0; i<strlen(copyListAns); i++) {
-    	   	printf("%c ",copyListAns[i]);
     	   	char tmp[3] = "";
     	   	
     	   	if(copyListAns[i] == '-') {
@@ -293,7 +292,6 @@ void *dealmsg(void *connfd) {
     	   		}
     	   	}
     	   	tmp[strlen(tmp)] = '\0';
-    	   	printf("%s\n",tmp);
     	   	
     	   	if(strlen(tmp) != 0) {
     	   		// printf("tmp is: %s\n", tmp);

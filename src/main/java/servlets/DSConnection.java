@@ -83,8 +83,49 @@ public class DSConnection {
         }
     }
 	
-	public static void DisplayPatientArrival() {
-		
-		update = 1;
+	public static void ChatFunction() {
+		if(keyAssignReq) {
+        	System.out.println("Start chat with patient!");
+        	
+        	
+        	while(true) {
+        		try {
+        			// write on output stream
+             		msg = CSConnection.scn.nextLine();
+             		msg = "DOC_SEND " + "<" + msg + ">";
+                 	System.out.println("Message to client: " + msg);
+                 	CSConnection.dos.write(msg);
+                 	CSConnection.dos.flush();
+                 	msg = "";        		
+             		
+        		} catch(IOException e) {
+        			e.printStackTrace();
+        			return ;
+        		}
+        		
+        		try {
+        			// read message to this patient(pat -> ser -> doc)
+             		BufferedReader br = new BufferedReader(CSConnection.dis);
+             		char[] buffer = new char[10000];
+             		int count = br.read(buffer, 0, 10000);
+             		reply = new String(buffer, 0, count);
+             		if (reply.contains("DOC_RECV")) {
+             			System.out.println("Message from client: " + reply + "\n");
+             			continue;
+             		} else {
+             			System.out.println("Format message not to doctor!");
+             			CSConnection.s.close();
+             		}
+             		// dos.close();
+             		CSConnection.dis.ready();         		
+             		
+        		} catch(IOException e) {
+        			e.printStackTrace();
+        			return ;
+        		}
+        	}
+        } else {
+        	System.out.println("Assignment not yet!");
+        }
 	}
 }

@@ -23,12 +23,6 @@ public class DoctorChatServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		DSConnection.main();
 		request.getRequestDispatcher("/chat-doc.jsp").forward(request, response);
-		while (true) {
-			if (DSConnection.update == 1) {
-				DSConnection.update = 0;
-				request.getRequestDispatcher("/chat-doc.jsp").forward(request, response);
-			}
-		}
 	}
 
 	/**
@@ -40,6 +34,8 @@ public class DoctorChatServlet extends HttpServlet {
 			System.out.println("SignOut and Reset Connection");
 			CSConnection.Reset();
 			response.sendRedirect("/netprog/login");
+		} else if (request.getParameter("send") != null) {
+			DSConnection.ChatFunction();
 		}
 	}
 

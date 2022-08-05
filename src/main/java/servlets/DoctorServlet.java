@@ -28,7 +28,7 @@ public class DoctorServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		if (CSConnection.keySympReq == true) {			
+		if (CSConnection.keySympReq == true) {
 			request.getRequestDispatcher("/doc.jsp").forward(request, response);
 		} else {
 			response.sendRedirect("/netprog/login");
